@@ -13,6 +13,8 @@ If you are a linux beginner or have never used ansible before, follow these step
 First of all you will need a ubuntu server 22.04 installation with a static IP, passwordless ssh login and passwordless sudo.
 I wont explain how to install ubuntu server 22.04. I personally use VirtualBox, give it 80GB of disk space and two network adapters, first one NAT and second one Host-Only network for pxe deployments.
 
+![preview](https://github.com/enricoanderson1337/ansible_linux_pxe_windows/blob/main/media/video.gif)
+
 ### Configure a static IP on the pxe-Server
 
 Ansible works over ssh and therefore it would be nice for your pxe-server to have a static ip.
