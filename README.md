@@ -1,9 +1,9 @@
 # Ansible Linux PXE Server for Windows ISO Deployments
 
-A pure Linux PXE Server, that provides a full unanttended Windows PXE Installation with customization features such as RunOnce-Script after first boot.
+A pure Linux PXE Server, that provides a full unanttended Windows PXE Installation with customization features such as RunOnce-Script after first boot. Tested on Ubuntu Server 22.04.
 
 __Disclaimer__: 
-- Tested on Ubuntu Server 22.04
+- WARNING: The PXE-Entries will automatically format your 1st disk, so be warned!
 - This was one of my first ansible projects and I would do many things differently today.
 - Give your pxe-server some disk space, usually 2.5 time the combined iso-sizes (80GB in my case).
 
