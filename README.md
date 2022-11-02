@@ -6,11 +6,32 @@ __Disclaimer__: Tested on Ubuntu Server 22.04. This was one of my first ansible 
 
 ## Requirements for Ansible
 
-If you have never used Ansible before, follow the steps:
+If you are a linux beginner and/or have never used Ansible before, follow the steps.
+First of all you will need a Ubuntu 22.04 Server installation with a static IP, passwordless ssh login and passwordless sudo.
 
-First of all you will need a Ubuntu 22.04 Server installation and a passwordless ssh login and passwordless sudo.
+### Configure a static IP on the PXE-Server
 
-### Make a ssh host entry for your ubuntu pxe server
+Edit the `/etc/netplan/00-installer-config.yaml` with sudo/root-priviledges.
+
+```
+# /etc/netplan/00-installer-config.yaml 
+network:
+  ethernets:
+    # This is my DHCP-based Internet adapter
+    enp0s3:
+      dhcp4: true
+    # This is my static IP for the PXE-Network
+    enp0s10:
+      dhcp4: false
+      addresses:
+        - 192.168.56.12/24
+  version: 2
+```
+
+After the edit apply the config with `netplan apply` and check the result with `ip a`.
+
+
+### Make a ssh host entry for your ubuntu PXE-Server
 
 To be able to log on via `ssh <hostname>` instead of `ssh <username>@<IP>` make an entry to your `~/.ssh/config`
 
