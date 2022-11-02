@@ -7,24 +7,25 @@ __Disclaimer__:
 - This was one of my first ansible projects and I would do many things differently today.
 - Give your pxe-server some disk space, usually 2.5 time the combined iso-sizes (80GB in my case).
 
-## Crashcourse for ansible
+## ansible crashcourse
 
-If you are a linux beginner and/or have never used Ansible before, follow the steps.
-First of all you will need a Ubuntu 22.04 Server installation with a static IP, passwordless ssh login and passwordless sudo.
+If you are a linux beginner or have never used ansible before, follow these steps.
+First of all you will need a ubuntu server 22.04 installation with a static IP, passwordless ssh login and passwordless sudo.
+I wont explain how to install ubuntu server 22.04. I personally use VirtualBox, give it 80GB of disk space and two network adapters, first one NAT and second one Host-Only network for pxe deployments.
 
 ### Configure a static IP on the pxe-Server
 
-Ansible works over ssh and therefor it would be nice for your pxe-server to have a static ip.
+Ansible works over ssh and therefore it would be nice for your pxe-server to have a static ip.
 Edit the `/etc/netplan/00-installer-config.yaml` with sudo/root-privileges.
 
 ```
 # /etc/netplan/00-installer-config.yaml 
 network:
   ethernets:
-    # This is my DHCP-based Internet adapter
+    # This is my dhcp-based internet adapter
     enp0s3:
       dhcp4: true
-    # This is my static IP for the PXE-Network
+    # This is my static IP for the pxe-Network
     enp0s10:
       dhcp4: false
       addresses:
@@ -83,13 +84,13 @@ Edit the `/etc/sudoers` file by entering `visudo` or just edit the sudeors file 
 ## Required ISO files
 
 I sadly cannot provide you with the WAIK or Windows-ISOs in this repository.
-The WAIK iso is absolutely required, you can download it [here](https://www.microsoft.com/en-us/download/details.aspx?id=5753). Put the file named `KB3AIK_EN.iso` into `roles/pxe/files/KB3AIK_EN.iso`
+The WAIK iso is required, you can download it [here](https://www.microsoft.com/en-us/download/details.aspx?id=5753). Put the file named `KB3AIK_EN.iso` into `roles/pxe/files/KB3AIK_EN.iso`
 
 ## Windows ISOs
 
-For a Windows ISO to work out of the box with zero user input I provide you with `unattended.xml` files for:
+For a Windows ISO to work out of the box with zero user input I provide you with `unattended.xml` files for the following versions:
 
-| Windows Version | Language | md5sum | Download-Link | Filename |
+| Windows Version | Language | md5sum | Download-Link | Preconfigured path and filename |
 |---|---|---|---|---|
 | Windows 7 x64 | English | | [archive.org](https://archive.org/details/win7-pro-sp1-english) | roles/pxe/files/Windows_7_x64_eng.iso |
 | Windows 7 x64 | German | | [archive.org](https://archive.org/download/Windows7UltimateSP1x64German) | roles/pxe/files/Windows_7_x64_ger.iso |
