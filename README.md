@@ -7,13 +7,13 @@ __Disclaimer__:
 - This was one of my first ansible projects and I would do many things differently today.
 - Give your pxe-server some disk space, usually 2.5 time the combined iso-sizes (80GB in my case).
 
+![preview](https://github.com/enricoanderson1337/ansible_linux_pxe_windows/blob/main/media/video.gif)
+
 ## ansible crashcourse
 
 If you are a linux beginner or have never used ansible before, follow these steps.
 First of all you will need a ubuntu server 22.04 installation with a static IP, passwordless ssh login and passwordless sudo.
 I wont explain how to install ubuntu server 22.04. I personally use VirtualBox, give it 80GB of disk space and two network adapters, first one NAT and second one Host-Only network for pxe deployments.
-
-![preview](https://github.com/enricoanderson1337/ansible_linux_pxe_windows/blob/main/media/video.gif)
 
 ### Configure a static IP on the pxe-Server
 
@@ -174,4 +174,20 @@ The process can take several minutes, because the iso-files will be copied and e
 
 Start a client in the same network and choose network-boot. you should boot into the pxe-menu.
 Username is usually `admin:admin` and `Administrator:admin`.
+
+## Advanced features
+
+### Choose your background
+
+one of the outstanding advanced features is the choice between three highly disturbing background images:
+
+#### Evilpooh
+![evilpooh](https://github.com/enricoanderson1337/ansible_linux_pxe_windows/blob/main/roles/pxe/files/pxe_backgrounds/evilpooh.png)
+
+#### Normal
+![normal](https://github.com/enricoanderson1337/ansible_linux_pxe_windows/blob/main/roles/pxe/files/pxe_backgrounds/normal.png)
+
+#### Rarepepe
+![rarepepe](https://github.com/enricoanderson1337/ansible_linux_pxe_windows/blob/main/roles/pxe/files/pxe_backgrounds/rarepepe.png)
+
 
