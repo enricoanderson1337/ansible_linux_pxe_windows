@@ -2,7 +2,10 @@
 
 A pure Linux PXE Server, that provides a full unanttended Windows PXE Installation with customization features such as RunOnce-Script after first boot.
 
-__Disclaimer__: Tested on Ubuntu Server 22.04. This was one of my first ansible projects and I would do many things differently today.
+__Disclaimer__: 
+- Tested on Ubuntu Server 22.04
+- This was one of my first ansible projects and I would do many things differently today.
+- Give your pxe-server some disk space, usually 2.5 time the combined iso-sizes (80GB in my case).
 
 ## Crashcourse for ansible
 
@@ -86,19 +89,86 @@ The WAIK iso is absolutely required, you can download it [here](https://www.micr
 
 For a Windows ISO to work out of the box with zero user input I provide you with `unattended.xml` files for:
 
-| Windows Version | Language | md5sum | Donwload-Link |
-|---|---|---|---|
-| Windows 7 x64 | English | | [archive.org](https://archive.org/details/win7-pro-sp1-english) |
-| Windows 7 x64 | German | | [archive.org](https://archive.org/download/Windows7UltimateSP1x64German) |
-| Windows 10 x64 | English | | google it, microsoft provides links |
-| Windows 10 x64 | German | | google it, microsoft provides links |
-| Windows Server 2008 R2 x64 EVAL | English | | google it, microsoft provides links |
-| Windows Server 2012 R2 x64 EVAL | English | | google it, microsoft provides links |
-| Windows Server 2019 x64 EVAL | English | | google it, microsoft provides links |
+| Windows Version | Language | md5sum | Download-Link | Filename |
+|---|---|---|---|---|
+| Windows 7 x64 | English | | [archive.org](https://archive.org/details/win7-pro-sp1-english) | roles/pxe/files/Windows_7_x64_eng.iso |
+| Windows 7 x64 | German | | [archive.org](https://archive.org/download/Windows7UltimateSP1x64German) | roles/pxe/files/Windows_7_x64_ger.iso |
+| Windows 10 x64 | English | | google it, microsoft provides links | roles/pxe/files/Windows_10_x64_eng.iso |
+| Windows 10 x64 | German | | google it, microsoft provides links | roles/pxe/files/Windows_10_x64_ger.iso |
+| Windows Server 2008 R2 x64 EVAL | English | | google it, microsoft provides links | roles/pxe/files/Windows_Server_2008R2_eng_eval.iso |
+| Windows Server 2012 R2 x64 EVAL | English | | google it, microsoft provides links | roles/pxe/files/Windows_Server_2012R2_eng_eval.iso |
+| Windows Server 2019 x64 EVAL | English | | google it, microsoft provides links | roles/pxe/files/Windows_Server_2019_eng_eval.iso |
 
+## Edit the ansible group_vars
 
+Depending on the isos you downloaded, edit and/or change the entries.
+If you need other entries, then you need to create your own `unattended.xml` files.
 
+```
+---
+windows:
+  - name: windows_server_2008r2_eng
+    bootentry: Windows Server 2008 R2 English
+    bootcategory: server
+    isofile: Windows_Server_2008R2_eng_eval.iso
+    unattendedfile: windows_server_2008r2_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_server_2008r2_startscript.cmd.j2
+[...]
 
+# Unimportant
+pxeserver:
+  # Options: normal.png | rarepepe.png | evilpooh.png
+  background: normal.png
+  directory: /pxeboot
+  directories:
+    - /pxebuild
+    - /pxebuild/waikiso
+    - /pxebuild/winpeiso
+    - /pxebuild/winpeiso_modified
+    - /pxebuild/winpeiso_wim
 
+pxebuild:
+  directory: /pxebuild
+  waikisomountdir: /pxebuild/waikiso
+  winpeisomountdir: /pxebuild/winpeiso
+  winpemoddir: /pxebuild/winpeiso_modified
+  winpewimmountdir: /pxebuild/winpeiso_wim
 
+samba:
+  directory: /pxesamba
+  isomountdir: /pxesamba/iso
+```
+
+## Edit the ansible inventory
+
+The pxe-server needs some config info from you, so put your details in the `inventory/hosts.yaml` file.
+
+```
+# Group name, leave it as it is
+pxe_servers:
+  hosts:
+    # The actual hostname of your server, change the value if you named it differently in your ssh-config/dns
+    pxe-server:
+      network_config:
+        # the interface name, where the pxe services should listen on
+        interface_name: "enp0s10"
+        # the ip of the interface
+        interface_ip: "192.168.56.12"
+        dhcp_range:
+          # the start and end of the dhcp range, assuming /24 range
+          start: "192.168.56.230"
+          end: "192.168.56.240"
+```
+
+## Run the playbook
+
+The process can take several minutes, because the iso-files will be copied and extracted on the pxe-server.
+
+`ansible-playbook -i inventory/hosts.yaml playbook_bootstrap_pxe.yaml`
+
+## Test the result
+
+Start a client in the same network and choose network-boot. you should boot into the pxe-menu.
+Username is usually `admin:admin` and `Administrator:admin`.
 
