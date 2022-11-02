@@ -1,0 +1,6 @@
+@echo off
+color 02
+echo [+] Putting RunOnce Startup Sript into Registry
+REG ADD HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v RunScript /t REG_SZ /d "C:\scripts\startscript.cmd" /f > null 2>&1
+echo [+] My job here is done
+timeout 10

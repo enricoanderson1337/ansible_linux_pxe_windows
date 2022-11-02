@@ -1,0 +1,72 @@
+---
+windows:
+  - name: windows_server_2008r2_eng
+    bootentry: Windows Server 2008 R2 English
+    bootcategory: server
+    isofile: Windows_Server_2008R2_eng_eval.iso
+    unattendedfile: windows_server_2008r2_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_server_2008r2_startscript.cmd.j2
+  - name: windows_server_2012r2_eng
+    bootentry: Windows Server 2012 R2 English
+    bootcategory: server
+    isofile: Windows_Server_2012R2_eng_eval.iso
+    unattendedfile: windows_server_2012r2_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_server_2012r2_startscript.cmd.j2
+  - name: windows_server_2019_eng
+    bootentry: Windows Server 2019 English
+    bootcategory: server
+    isofile: Windows_Server_2019_eng_eval.iso
+    unattendedfile: windows_server_2019_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_server_2019_startscript.cmd.j2
+  - name: windows_10_eng
+    bootentry: Windows 10 English
+    bootcategory: client
+    isofile: Windows_10_x64_eng.iso
+    unattendedfile: windows_10_eng_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_10_startscript.cmd.j2
+  - name: windows_10_ger
+    bootentry: Windows 10 German
+    bootcategory: client
+    isofile: Windows_10_x64_ger.iso
+    unattendedfile: windows_10_ger_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_10_startscript.cmd.j2
+  - name: windows_7_eng
+    bootentry: Windows 7 English
+    bootcategory: client
+    isofile: Windows_7_x64_eng.iso
+    unattendedfile: windows_7_eng_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_7_startscript.cmd.j2
+  - name: windows_7_ger
+    bootentry: Windows 7 German
+    bootcategory: client
+    isofile: Windows_7_x64_ger.iso
+    unattendedfile: windows_7_ger_unattend.xml.j2
+    bootstrapscript: windows_all_bootstrap.cmd.j2
+    startscript: windows_7_startscript.cmd.j2
+
+pxeserver:
+  background: normal.png
+  directory: /pxeboot
+  directories:
+    - /pxebuild
+    - /pxebuild/waikiso
+    - /pxebuild/winpeiso
+    - /pxebuild/winpeiso_modified
+    - /pxebuild/winpeiso_wim
+
+pxebuild:
+  directory: /pxebuild
+  waikisomountdir: /pxebuild/waikiso
+  winpeisomountdir: /pxebuild/winpeiso
+  winpemoddir: /pxebuild/winpeiso_modified
+  winpewimmountdir: /pxebuild/winpeiso_wim
+
+samba:
+  directory: /pxesamba
+  isomountdir: /pxesamba/iso

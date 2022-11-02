@@ -1,0 +1,9 @@
+pxe_servers:
+  hosts:
+    pxe-server:
+      network_config:
+        interface_name: "enp0s10"
+        interface_ip: "192.168.56.12"
+        dhcp_range:
+          start: "192.168.56.230"
+          end: "192.168.56.240"

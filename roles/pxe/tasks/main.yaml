@@ -1,0 +1,182 @@
+---
+- name: dnsmasq | Ensure dnsmasq and bootloader files are present
+  become: yes
+  apt:
+    name:
+      - dnsmasq
+      - syslinux
+      - pxelinux
+    state: latest
+
+- name: dnsmasq | Copy Config
+  become: yes
+  template:
+    src: "dnsmasq.conf.j2"
+    dest: "/etc/dnsmasq.conf"
+    owner: root
+    group: root
+    mode: 0640
+
+- name: dnsmasq | Ensure PXE-Boot Directories exist
+  become: yes
+  file:
+    name: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ pxeserver.directory }}"
+    - "{{ pxeserver.directory }}/pxelinux.cfg"
+
+- name: dnsmasq | Copy required pxelinux and syslinux boot files
+  become: yes
+  shell: |
+    cp -rf /usr/lib/syslinux/modules/bios/* "{{ pxeserver.directory }}"
+    cp -rf /usr/lib/syslinux/memdisk "{{ pxeserver.directory }}"
+    cp -rf /usr/lib/PXELINUX/pxelinux.0 "{{ pxeserver.directory }}"
+
+- name: dnsmasq | Copy dnsmasq config and background
+  become: yes
+  copy:
+    src: "pxe_backgrounds/{{ pxeserver.background }}"
+    dest: "{{ pxeserver.directory }}/pxebackground.png"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: dnsmasq | Copy dnsmasq config
+  become: yes
+  template:
+    src: "default.j2"
+    dest: "{{ pxeserver.directory }}/pxelinux.cfg/default"
+
+- name: dnsmasq | Ensure dnsmasq service is started an enabled
+  become: yes
+  systemd:
+    name: dnsmasq
+    enabled: yes
+    state: restarted
+    daemon_reload: yes
+
+- name: samba | Ensure samba is installed
+  become: yes
+  apt:
+    name: samba
+    state: present
+
+- name: samba | Ensure samba directories exist
+  become: yes
+  file:
+    name: "{{ item }}"
+    owner: root
+    group: root
+    state: directory
+  with_items:
+    - "{{ samba.directory }}"
+    - "{{ samba.isomountdir }}"
+
+- name: samba | Ensure samba share directories exist
+  become: yes
+  file:
+    name: "{{ samba.directory }}/{{ item.name }}"
+    owner: root
+    group: root
+    state: directory
+  with_items:
+    - "{{ windows }}"
+
+- name: samba | Copy samba config
+  become: yes
+  template:
+    src: "smb.conf.j2"
+    dest: "/etc/samba/smb.conf"
+
+- name: samba | Ensure samba service is started an enabled
+  become: yes
+  systemd:
+    name: smbd
+    enabled: yes
+    state: restarted
+    daemon_reload: yes
+
+- name: samba | Copy Windows ISO Files
+  become: yes
+  copy:
+    src: "{{ item.isofile }}"
+    dest: "{{ samba.directory }}"
+  with_items:
+    - "{{ windows }}"
+
+- name: samba | Extract ISO Contents to samba shares
+  include_tasks: extract_iso.yaml
+  loop: "{{ windows }}"
+  loop_control:
+    loop_var: windows
+
+- name: winpe | Ensure windows PE tools are installed
+  become: yes
+  apt:
+    name:
+      - genisoimage
+      - wimtools
+      - cabextract
+    state: present
+
+- name: winpe | Ensure build directories exist
+  become: yes
+  file:
+    name: "{{ item }}"
+    owner: root
+    group: root
+    state: directory
+  with_items:
+    - "{{ pxeserver.directories }}"
+
+- name: winpe | Copy WAIK ISO
+  become: yes
+  copy:
+    src: KB3AIK_EN.iso
+    dest: "{{ pxebuild.directory }}/KB3AIK_EN.iso"
+
+- name: winpe | Mount WAIK ISO
+  become: yes
+  shell: |
+    mount -o loop "{{ pxebuild.directory }}/KB3AIK_EN.iso" "{{ pxebuild.waikisomountdir }}"
+
+- name: winpe | Extracting bootloader from WAIK ISO
+  become: yes
+  shell: |
+    cabextract "{{ pxebuild.waikisomountdir }}/wAIKAMD64.msi" -F F_WINPE_AMD64_etfsboot.com -p > "{{ pxebuild.winpemoddir }}/etfsboot.com"
+
+- name: winpe | Generate base winpe.iso
+  become: yes
+  shell: |
+    mkwinpeimg --iso --arch=amd64 --waik-dir="{{ pxebuild.waikisomountdir }}" "{{ pxebuild.directory }}/winpe.iso"
+
+- name: winpe | Unmount WAIK ISO
+  become: yes
+  shell: |
+    umount /pxebuild/waikiso
+
+- name: winpe | Copy contents from winpe.iso to build directory
+  become: yes
+  shell: |
+    mount -o loop "{{ pxebuild.directory }}/winpe.iso" "{{ pxebuild.winpeisomountdir }}"
+    cp -rv "{{ pxebuild.winpeisomountdir }}"/* "{{ pxebuild.winpemoddir }}"
+    umount /pxebuild/winpeiso
+
+- name: winpe | Build Windows winpe isos with autostart
+  include_tasks: build_winpe_iso.yaml
+  loop: "{{ windows }}"
+  loop_control:
+    loop_var: windows
+
+- name: winpe | Copy unattended configuration files to samba
+  include_tasks: copy_unattend_xml.yaml
+  loop: "{{ windows }}"
+  loop_control:
+    loop_var: windows
+
+- name: winpe | Copy startscript configuration files to samba
+  include_tasks: copy_start_scripts.yaml
+  loop: "{{ windows }}"
+  loop_control:
+    loop_var: windows

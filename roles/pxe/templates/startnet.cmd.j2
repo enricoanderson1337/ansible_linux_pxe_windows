@@ -1,0 +1,4 @@
+wpeinit
+net use Z: \\{{ network_config.interface_ip }}\{{ windows.name }}
+timeout 5
+Z:\setup.exe /unattend:Z:\unattend.xml

@@ -1,0 +1,6 @@
+---
+- name: copy_unattend_xml | "{{ windows.name }}" Copy unattended configuration files to samba share
+  become: yes
+  template:
+    src: "{{ windows.unattendedfile }}"
+    dest: "{{ samba.directory }}/{{ windows.name }}/unattend.xml"

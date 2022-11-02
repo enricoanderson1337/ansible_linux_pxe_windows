@@ -1,0 +1,13 @@
+interface={{ network_config.interface_name }}
+bind-interfaces
+domain=pxe.local
+ 
+dhcp-range={{ network_config.interface_name }},{{ network_config.dhcp_range.start }},{{ network_config.dhcp_range.end }},255.255.255.0,8h
+dhcp-option=option:router,{{ network_config.interface_ip }}
+dhcp-option=option:dns-server,{{ network_config.interface_ip }}
+  
+enable-tftp
+tftp-root=/pxeboot
+dhcp-boot=pxelinux.0,linuxhint-s20,{{ network_config.interface_ip }}
+pxe-prompt="Press F8 for PXE Network boot.", 1
+pxe-service=x86PC, "Install OS via PXE",pxelinux

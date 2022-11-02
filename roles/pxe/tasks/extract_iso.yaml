@@ -1,0 +1,25 @@
+---
+- name: extract iso | Mount ISO File "{{ windows.name }}"
+  become: yes
+  shell: |
+    mount -o loop "{{ samba.directory }}/{{ windows.isofile }}" "{{ samba.isomountdir }}"
+
+- name: extract iso | Copy ISO Contents to samba share "{{ windows.name }}"
+  become: yes
+  shell: |
+    cp -r "{{ samba.isomountdir }}"/* "{{ samba.directory }}/{{ windows.name }}"
+
+- name: extract iso | Adjusting rights
+  become: yes
+  shell: |
+    chmod -R 775 "{{ samba.directory }}/{{ windows.name }}"
+
+- name: extract iso | Unmount ISO File "{{ windows.name }}"
+  become: yes
+  shell: |
+    umount "{{ samba.isomountdir }}"
+
+- name: extract iso | Delete ISO "{{ windows.name }}"
+  become: yes
+  shell: |
+    rm "{{ samba.directory }}/{{ windows.isofile }}"

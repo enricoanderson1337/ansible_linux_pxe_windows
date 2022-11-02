@@ -1,0 +1,21 @@
+---
+- name: copy_start_scripts | "{{ windows.name }}" Ensure OEM Directory exist
+  become: yes
+  file:
+    path: "{{ samba.directory }}/{{ windows.name }}/sources/$OEM$/$1/scripts/"
+    state: directory
+    recurse: yes
+
+
+- name: copy_start_scripts | "{{ windows.name }}" Copy bootstrap script to OEM Directory
+  become: yes
+  template:
+    src: "{{ windows.bootstrapscript }}"
+    dest: "{{ samba.directory }}/{{ windows.name }}/sources/$OEM$/$1/scripts/bootstrap.cmd"
+
+
+- name: copy_start_scripts | "{{ windows.name }}" Copy start scripts to OEM Directory
+  become: yes
+  template:
+    src: "{{ windows.startscript }}"
+    dest: "{{ samba.directory }}/{{ windows.name }}/sources/$OEM$/$1/scripts/startscript.cmd"

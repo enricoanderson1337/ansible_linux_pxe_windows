@@ -1,0 +1,26 @@
+---
+- name: build_winpe_iso | Mount boot.wim "{{ windows.name }}"
+  become: yes
+  shell: |
+    wimmountrw "{{ pxebuild.winpemoddir }}/sources/boot.wim" "{{ pxebuild.winpewimmountdir }}"
+
+- name: build_winpe_iso | Copy startmet.cmd to tmp
+  become: yes
+  template:
+    src: startnet.cmd.j2
+    dest: /tmp/startnet.cmd
+
+- name: build_winpe_iso | Copy startnet.cmd from tmp to boot.wim "{{ windows.name }}"
+  become: yes
+  shell: |
+    cp /tmp/startnet.cmd "{{ pxebuild.winpewimmountdir }}/Windows/System32/startnet.cmd"
+
+- name: build_winpe_iso | Commit wim image "{{ windows.name }}"
+  become: yes
+  shell: |
+    wimunmount --commit "{{ pxebuild.winpewimmountdir }}"
+
+- name: build_winpe_iso | Build winpe iso with autostart features "{{ windows.name }}"
+  become: yes
+  shell: |
+    mkisofs -sysid "" -A "" -V "Microsoft Windows PE AMD64" -d -N -b etfsboot.com -no-emul-boot -c boot.cat -hide etfsboot.com -hide boot.cat -quiet -o "{{ pxeserver.directory }}/{{ windows.name }}.iso" "{{ pxebuild.winpemoddir }}" 

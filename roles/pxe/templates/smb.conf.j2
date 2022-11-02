@@ -1,0 +1,13 @@
+[global]
+  workgroup = WORKGROUP
+  map to guest = bad user
+  usershare allow guests = yes
+
+{% for version in windows %}
+[{{ version.name }}]
+   browsable = true
+   read only = yes
+   guest ok = yes
+   path = {{ samba.directory }}/{{ version.name }}
+
+{% endfor %}
