@@ -4,14 +4,14 @@ A pure Linux PXE Server, that provides a full unanttended Windows PXE Installati
 
 __Disclaimer__: Tested on Ubuntu Server 22.04. This was one of my first ansible projects and I would do many things differently today.
 
-## Requirements for Ansible
+## Requirements for ansible
 
 If you are a linux beginner and/or have never used Ansible before, follow the steps.
 First of all you will need a Ubuntu 22.04 Server installation with a static IP, passwordless ssh login and passwordless sudo.
 
-### Configure a static IP on the PXE-Server
+### Configure a static IP on the pxe-Server
 
-Edit the `/etc/netplan/00-installer-config.yaml` with sudo/root-priviledges.
+Edit the `/etc/netplan/00-installer-config.yaml` with sudo/root-privileges.
 
 ```
 # /etc/netplan/00-installer-config.yaml 
@@ -31,7 +31,7 @@ network:
 After the edit apply the config with `netplan apply` and check the result with `ip a`.
 
 
-### Make a ssh host entry for your ubuntu PXE-Server
+### Make a ssh host entry for your ubuntu pxe-Server
 
 To be able to log on via `ssh <hostname>` instead of `ssh <username>@<IP>` make an entry to your `~/.ssh/config`
 
@@ -59,6 +59,18 @@ ssh-copy-id pxeserver
 ```
 
 Test if you dont need to enter a password anymore to login via ssh by typing `ssh pxe-server`.
+
+### Passwordless sudo
+
+Edit the `/etc/sudoers` file by entering `visudo` or just edit the sudeors file like a madman by typing `sudo vim /etc/sudeors`.
+
+```
+# /etc/sudeors
+# Add the line with the <username> after the %sudo
+
+%sudo   ALL=(ALL:ALL) ALL
+<username>    ALL=(ALL:ALL) NOPASSWD:ALL
+```
 
 
 
